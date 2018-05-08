@@ -5,6 +5,8 @@ import subprocess
 
 date = time.strftime('%m%d%y')
 tick = time.strftime('%T ')
+# This makes it so it does not matter where you run the script from, it will
+# always find the hosts.txt file inside the directory the script is located.
 scriptLocation = os.path.dirname(os.path.realpath(__file__))
 
 
