@@ -14,6 +14,7 @@ class colors:
 
 
 def poll(host):
+    """Ping the hosts in the host file"""
     # Create subprocess object for ping
     p = subprocess.Popen('ping -c 1 -W 1 '
                          + str(host),
@@ -27,23 +28,25 @@ def poll(host):
         return True
 
 
-# Create function to initialize host file with false count
 def init(host):
+    """Initialize host file with false count(for poll funct)"""
     with open('hosts.txt', 'r') as f:
         for host in f:
             hosts.setdefault(host, 0)
 
 
-# Create function to ping the hosts
 def ping_hosts(hosts):
+    """Use poll function to ping the hosts and change values inside the host
+       dictionary"""
     with open('hosts.txt', 'r') as f:
         for host in f:
             # If host is up set counter to zero
             if poll(host):
-                # Write to file if host came back from down state
+                # Write to file if host came back from down state and speak
                 if hosts[host] / 2 > 5:
                     upAlert = os.system('espeak ' + host.strip() + '"is up"')
-                    print(tick + host.strip().ljust(15) + ' Came Up')
+                    print(tick + host.strip().ljust(15) + ' Came Up',
+                          file=open(date + '.txt.', 'a'))
                     upAlert
                 hosts[host] = 0
             # If host is down add to counter
@@ -51,8 +54,9 @@ def ping_hosts(hosts):
                 hosts[host] = hosts[host] + 1
 
 
-# Create function to check if hosts are above the threshold
 def check_hosts(threshold=5):
+    """Checks to see if the host is above the threshold and prints to the
+       screen"""
     # Write to file the time host goes down
     os.system('clear')
     for host in hosts:
@@ -67,6 +71,7 @@ def check_hosts(threshold=5):
                   + colors.WARN
                   + 'Down!'
                   + colors.END)
+        # Print to screen the Status of hosts
         elif (hosts[host] / 2) > 5:
             print(host.strip().ljust(15)
                   + ' is '
@@ -83,7 +88,11 @@ def check_hosts(threshold=5):
 
 if __name__ == '__main__':
     hosts = {}
+    # Initialize hosts
     init(hosts)
+    # Print to file that program has started
+    print("*****Starting Program*****",
+          file=open(date + '.txt', 'a'))
     while True:
         ping_hosts(hosts)
         check_hosts()
