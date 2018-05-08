@@ -5,6 +5,7 @@ import subprocess
 
 date = time.strftime('%m%d%y')
 tick = time.strftime('%T ')
+hostsFile = os.path.dirname(os.path.realpath('hosts.txt'))
 
 
 class colors:
