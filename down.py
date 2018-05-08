@@ -49,7 +49,8 @@ def ping_hosts(hosts):
                 if hosts[host] / 2 > 5:
                     upAlert = os.system('espeak ' + host.strip() + '"is up"')
                     print(tick + host.strip().ljust(15) + ' Came Up',
-                          file=open(date + '.txt.', 'a'))
+                          file=open(scriptLocation + '/' + date
+                                    + '.txt.', 'a'))
                     upAlert
                 hosts[host] = 0
             # If host is down add to counter
@@ -67,7 +68,7 @@ def check_hosts(threshold=5):
         if hosts[host] / 2 == 5:
             downAlert = os.system('espeak ' + host.strip() + '"is down"')
             print(tick + host.strip().ljust(15) + ' Went Down',
-                  file=open(date + '.txt', 'a'))
+                  file=open(scriptLocation + '/' + date + '.txt', 'a'))
             downAlert
             print(host.strip().ljust(15)
                   + ' is '
