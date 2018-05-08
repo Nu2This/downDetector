@@ -5,7 +5,7 @@ import subprocess
 
 date = time.strftime('%m%d%y')
 tick = time.strftime('%T ')
-hostsFile = os.path.dirname(os.path.realpath('hosts.txt'))
+scriptLocation = os.path.dirname(os.path.realpath(__file__))
 
 
 class colors:
@@ -31,7 +31,7 @@ def poll(host):
 
 def init(host):
     """Initialize host file with false count(for poll funct)"""
-    with open('hosts.txt', 'r') as f:
+    with open(scriptLocation + '/hosts.txt', 'r') as f:
         for host in f:
             hosts.setdefault(host, 0)
 
@@ -39,7 +39,7 @@ def init(host):
 def ping_hosts(hosts):
     """Use poll function to ping the hosts and change values inside the host
        dictionary"""
-    with open('hosts.txt', 'r') as f:
+    with open(scriptLocation + '/hosts.txt', 'r') as f:
         for host in f:
             # If host is up set counter to zero
             if poll(host):
