@@ -49,10 +49,9 @@ def ping_hosts():
         if poll(entry['host']):
             # Write to file if host came back from down state and speak
             if entry['count'] / 2 > 5:
-                upAlert = os.system('espeak ' + entry['host'] + '"is up"')
+                upAlert = os.system('espeak ' + entry['label'] + '"is up"')
                 print(tick + entry['host'].ljust(15) + ' Came Up',
-                      file=open(scriptLocation + '/' + date
-                                + '.txt', 'a'))
+                      file=open(scriptLocation + '/' + date + '.txt', 'a'))
                 upAlert
             entry['count'] = 0
         # If host is down add to counter
@@ -68,7 +67,7 @@ def check_hosts(threshold=5):
     for entry in master:
         # If it hits the threshold write to file and speak
         if entry['count'] / 2 == 5:
-            downAlert = os.system('espeak ' + entry['host'] + '"is down"')
+            downAlert = os.system('espeak ' + entry['label'] + '"is down"')
             print(tick + entry['host'].ljust(15) + ' Went Down',
                   file=open(scriptLocation + '/' + date + '.txt', 'a'))
             downAlert
@@ -105,4 +104,4 @@ if __name__ == '__main__':
     while True:
         ping_hosts()
         check_hosts()
-        time.sleep(10)
+        time.sleep(1)
