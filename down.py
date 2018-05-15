@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
 import os
 import time
 import subprocess
 
 
-date = time.strftime('%m%d%y')
-tick = time.strftime('%T ')
+date = time.strftime('%m%y')
+tick = time.strftime('%d @ %T ')
+start = time.strftime('%m/%d/%y %T')
 # This makes it so it does not matter where you run the script from, it will
 # always find the hosts.txt file inside the directory the script is located.
 scriptLocation = os.path.dirname(os.path.realpath(__file__))
@@ -31,31 +33,31 @@ def poll(host):
         return True
 
 
-def init(host):
+def init(entry):
     """Initialize host file with false count(for poll funct)"""
     with open(scriptLocation + '/hosts.txt', 'r') as f:
-        for host in f:
-            hosts.setdefault(host, 0)
+        for line in f:
+            data = line.split()
+            master.append({'host': data[0], 'label': data[1], 'count': 0})
 
 
-def ping_hosts(hosts):
+def ping_hosts():
     """Use poll function to ping the hosts and change values inside the host
        dictionary"""
-    with open(scriptLocation + '/hosts.txt', 'r') as f:
-        for host in f:
-            # If host is up set counter to zero
-            if poll(host):
-                # Write to file if host came back from down state and speak
-                if hosts[host] / 2 > 5:
-                    upAlert = os.system('espeak ' + host.strip() + '"is up"')
-                    print(tick + host.strip().ljust(15) + ' Came Up',
-                          file=open(scriptLocation + '/' + date
-                                    + '.txt.', 'a'))
-                    upAlert
-                hosts[host] = 0
-            # If host is down add to counter
-            else:
-                hosts[host] = hosts[host] + 1
+    for entry in master:
+        # If host is up set counter to zero
+        if poll(entry['host']):
+            # Write to file if host came back from down state and speak
+            if entry['count'] / 2 > 5:
+                upAlert = os.system('espeak ' + entry['host'] + '"is up"')
+                print(tick + entry['host'].ljust(15) + ' Came Up',
+                      file=open(scriptLocation + '/' + date
+                                + '.txt', 'a'))
+                upAlert
+            entry['count'] = 0
+        # If host is down add to counter
+        else:
+            entry['count'] = entry['count'] + 1
 
 
 def check_hosts(threshold=5):
@@ -63,27 +65,30 @@ def check_hosts(threshold=5):
        screen"""
     # Write to file the time host goes down
     os.system('clear')
-    for host in hosts:
+    for entry in master:
         # If it hits the threshold write to file and speak
-        if hosts[host] / 2 == 5:
-            downAlert = os.system('espeak ' + host.strip() + '"is down"')
-            print(tick + host.strip().ljust(15) + ' Went Down',
+        if entry['count'] / 2 == 5:
+            downAlert = os.system('espeak ' + entry['host'] + '"is down"')
+            print(tick + entry['host'].ljust(15) + ' Went Down',
                   file=open(scriptLocation + '/' + date + '.txt', 'a'))
             downAlert
-            print(host.strip().ljust(15)
+            print(entry['host'].ljust(15)
+                  + entry['label'].ljust(13)
                   + ' is '
                   + colors.WARN
                   + 'Down!'
                   + colors.END)
         # Print to screen the Status of hosts
-        elif (hosts[host] / 2) > 5:
-            print(host.strip().ljust(15)
+        elif (entry['count'] / 2) > 5:
+            print(entry['host'].ljust(15)
+                  + entry['label'].ljust(13)
                   + ' is '
                   + colors.WARN
                   + 'DOWN!'
                   + colors.END)
         else:
-            print(host.strip().ljust(15)
+            print(entry['host'].ljust(15)
+                  + entry['label'].ljust(13)
                   + ' is '
                   + colors.OK
                   + 'UP'
@@ -91,13 +96,13 @@ def check_hosts(threshold=5):
 
 
 if __name__ == '__main__':
-    hosts = {}
+    master = []
     # Initialize hosts
-    init(hosts)
+    init(master)
     # Print to file that program has started
-    print("*****Starting Program*****",
+    print("*****Starting Program*****\n*****" + start + '****',
           file=open(date + '.txt', 'a'))
     while True:
-        ping_hosts(hosts)
+        ping_hosts()
         check_hosts()
         time.sleep(10)
