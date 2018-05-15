@@ -35,9 +35,13 @@ def poll(host):
 
 def init(entry):
     """Initialize host file with false count(for poll funct)"""
+    # Open hosts.txt file and create a master list to hold dicts
     with open(scriptLocation + '/hosts.txt', 'r') as f:
         for line in f:
+            # create a list from the data in the line
             data = line.split()
+            # Append to the master list a dictionary with labels and data
+            # from the 'data' variable
             master.append({'host': data[0], 'label': data[1], 'count': 0})
 
 
