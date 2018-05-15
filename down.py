@@ -104,4 +104,4 @@ if __name__ == '__main__':
     while True:
         ping_hosts()
         check_hosts()
-        time.sleep(1)
+        time.sleep(10)
