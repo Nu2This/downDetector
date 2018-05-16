@@ -4,9 +4,6 @@ import time
 import subprocess
 
 
-date = time.strftime('%m%y')
-tick = time.strftime('%d @ %T ')
-start = time.strftime('%m/%d/%y %T')
 # This makes it so it does not matter where you run the script from, it will
 # always find the hosts.txt file inside the directory the script is located.
 scriptLocation = os.path.dirname(os.path.realpath(__file__))
@@ -54,8 +51,11 @@ def ping_hosts():
             # Write to file if host came back from down state and speak
             if entry['count'] / 2 > 5:
                 upAlert = os.system('espeak ' + entry['label'] + '"is up"')
-                print(tick + entry['host'].ljust(15) + ' Came Up',
-                      file=open(scriptLocation + '/' + date + '.txt', 'a'))
+                print(time.strftime('%c') + entry['host'].ljust(15)
+                      + ' Came Up',
+                      file=open(scriptLocation + '/'
+                                + time.strftime('%m%y')
+                                + '.txt', 'a'))
                 upAlert
             entry['count'] = 0
         # If host is down add to counter
@@ -72,8 +72,10 @@ def check_hosts(threshold=5):
         # If it hits the threshold write to file and speak
         if entry['count'] / 2 == 5:
             downAlert = os.system('espeak ' + entry['label'] + '"is down"')
-            print(tick + entry['host'].ljust(15) + ' Went Down',
-                  file=open(scriptLocation + '/' + date + '.txt', 'a'))
+            print(time.strftime('%c') + entry['host'].ljust(15) + ' Went Down',
+                  file=open(scriptLocation + '/'
+                            + time.strftime('%m%y')
+                            + '.txt', 'a'))
             downAlert
             print(entry['host'].ljust(15)
                   + entry['label'].ljust(13)
@@ -103,8 +105,8 @@ if __name__ == '__main__':
     # Initialize hosts
     init(master)
     # Print to file that program has started
-    print("*****Starting Program*****\n*****" + start + '****',
-          file=open(date + '.txt', 'a'))
+    print("*****Starting Program*****\n*****" + time.strftime('%c') + '****',
+          file=open(time.strftime('%m%y') + '.txt', 'a'))
     while True:
         ping_hosts()
         check_hosts()
