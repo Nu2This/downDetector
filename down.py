@@ -105,9 +105,9 @@ if __name__ == '__main__':
     # Initialize hosts
     init(master)
     # Print to file that program has started
-    print("*****Starting Program*****\n*****" + time.strftime('%c') + '****',
+    print("*****Starting Program*****\n*" + time.strftime('%c') + '*',
           file=open(time.strftime('%m%y') + '.txt', 'a'))
     while True:
         ping_hosts()
         check_hosts()
-        time.sleep(10)
+        time.sleep(1)
