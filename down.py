@@ -2,7 +2,7 @@
 import os
 import time
 import subprocess
-
+#comment to be removed
 date = time.strftime('%m%y')
 tick = time.strftime('%d @ %T ')
 start = time.strftime('%m/%d/%y %T')
