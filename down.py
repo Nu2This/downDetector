@@ -11,6 +11,7 @@ start = time.strftime('%m/%d/%y %T')
 CURRENT_DIR = os.path.dirname(__file__)
 working_dir = os.path.join(CURRENT_DIR + 'data/')
 
+
 class colors:
     WARN = '\033[91m'
     END = '\033[0m'
@@ -22,17 +23,17 @@ def poll(host):
     # Create subprocess object for ping
     up = True
     p = subprocess.run('ping -c 1 -W 1 '
-                         + str(host),
-                         stdout=subprocess.PIPE,
-                         shell=True)
+                       + str(host),
+                       stdout=subprocess.PIPE,
+                       shell=True)
     text = p.stdout.decode('utf-8')
     line = text.split('\n')
     for item in line:
         if '0 packets received' in item:
-              print(str(time.time()) + ' ' + str(host) + ' Failed Ping',
-                    file=open(working_dir + time.strftime('%m%d@' + host)
-                             + '.txt', 'a+'))
-              up = False
+            print(str(time.time()) + ' ' + str(host) + ' Failed Ping',
+                  file=open(working_dir + time.strftime('%m%d@' + host)
+                            + '.txt', 'a+'))
+            up = False
         if 'time' in item:
             ms = item.split('time=', 1)[1]
             if float(ms.rstrip(' ms')) > 100:
