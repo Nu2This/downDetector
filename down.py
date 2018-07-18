@@ -3,14 +3,13 @@ import os
 import time
 import subprocess
 
-
 date = time.strftime('%m%y')
 tick = time.strftime('%d @ %T ')
 start = time.strftime('%m/%d/%y %T')
 # This makes it so it does not matter where you run the script from, it will
 # always find the hosts.txt file inside the directory the script is located.
-scriptLocation = os.path.dirname(os.path.realpath(__file__))
-
+CURRENT_DIR = os.path.dirname(__file__)
+working_dir = os.path.join(CURRENT_DIR + 'data/')
 
 class colors:
     WARN = '\033[91m'
@@ -21,21 +20,33 @@ class colors:
 def poll(host):
     """Ping the hosts in the host file"""
     # Create subprocess object for ping
-    p = subprocess.Popen('ping -c 1 -W 1 '
+    up = True
+    p = subprocess.run('ping -c 1 -W 1 '
                          + str(host),
                          stdout=subprocess.PIPE,
                          shell=True)
-    p.wait()
+    text = p.stdout.decode('utf-8')
+    line = text.split('\n')
+    for item in line:
+        if '0 packets received' in item:
+              print(str(time.time()) + ' ' + str(host) + ' Failed Ping',
+                    file=open(working_dir + time.strftime('%m%d@' + host)
+                             + '.txt', 'a+'))
+              up = False
+        if 'time' in item:
+            ms = item.split('time=', 1)[1]
+            if float(ms.rstrip(' ms')) > 100:
+                print(str(time.time()) + ' ' + str(host) + ' High(' + ms + ')',
+                      file=open(working_dir + time.strftime('%m%d@'+host)
+                                + '.txt', 'a+'))
+
     # Ping the host and return True if it is up
-    if p.poll() != 0:
-        return False
-    else:
-        return True
+    return up
 
 
 def init(entry):
     """Initialize host file with false count(for poll funct)"""
-    with open(scriptLocation + '/hosts.txt', 'r') as f:
+    with open(CURRENT_DIR + 'hosts.txt', 'r') as f:
         for line in f:
             data = line.split()
             master.append({'host': data[0], 'label': data[1], 'count': 0})
@@ -51,7 +62,7 @@ def ping_hosts():
             if entry['count'] / 2 > 5:
                 upAlert = os.system('espeak ' + entry['host'] + '"is up"')
                 print(tick + entry['host'].ljust(15) + ' Came Up',
-                      file=open(scriptLocation + '/' + date
+                      file=open(CURRENT_DIR + '/' + date
                                 + '.txt', 'a'))
                 upAlert
             entry['count'] = 0
@@ -70,7 +81,7 @@ def check_hosts(threshold=5):
         if entry['count'] / 2 == 5:
             downAlert = os.system('espeak ' + entry['host'] + '"is down"')
             print(tick + entry['host'].ljust(15) + ' Went Down',
-                  file=open(scriptLocation + '/' + date + '.txt', 'a'))
+                  file=open(CURRENT_DIR + '/' + date + '.txt', 'a'))
             downAlert
             print(entry['host'].ljust(15)
                   + entry['label'].ljust(13)
