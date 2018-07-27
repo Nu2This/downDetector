@@ -26,8 +26,11 @@ def poll(host):
                        + str(host),
                        stdout=subprocess.PIPE,
                        shell=True)
+    # Create object to store the text from the ping
     text = p.stdout.decode('utf-8')
+    # Split ping response into separate lines for parsing
     line = text.split('\n')
+    # Parses the lines from stdout to see if a ping failed or succeeded
     for item in line:
         if '0 packets received' in item:
             print(str(time.time()) + ' ' + str(host) + ' Failed Ping',
@@ -46,11 +49,12 @@ def poll(host):
 
 
 def init(entry):
-    """Initialize host file with false count(for poll funct)"""
+    """Initialize host file with false count(for poll funct), and adds
+    a place to store the ping in milliseconds to the file"""
     with open(CURRENT_DIR + 'hosts.txt', 'r') as f:
         for line in f:
             data = line.split()
-            master.append({'host': data[0], 'label': data[1], 'count': 0})
+            master.append({'host': data[0], 'label': data[1], 'count': 0, 'pms':0})
 
 
 def ping_hosts():
@@ -61,7 +65,7 @@ def ping_hosts():
         if poll(entry['host']):
             # Write to file if host came back from down state and speak
             if entry['count'] / 2 > 5:
-                upAlert = os.system('espeak ' + entry['host'] + '"is up"')
+                upAlert = os.system('espeak ' + entry['label'] + '"is up"')
                 print(tick + entry['host'].ljust(15) + ' Came Up',
                       file=open(CURRENT_DIR + date
                                 + '.txt', 'a'))
@@ -80,7 +84,7 @@ def check_hosts(threshold=5):
     for entry in master:
         # If it hits the threshold write to file and speak
         if entry['count'] / 2 == 5:
-            downAlert = os.system('espeak ' + entry['host'] + '"is down"')
+            downAlert = os.system('espeak ' + entry['label'] + '"is down"')
             print(tick + entry['host'].ljust(15) + ' Went Down',
                   file=open(CURRENT_DIR + date + '.txt', 'a'))
             downAlert
@@ -117,4 +121,4 @@ if __name__ == '__main__':
     while True:
         ping_hosts()
         check_hosts()
-        time.sleep(10)
+        time.sleep(1)
